@@ -1,0 +1,39 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Validacao formula1
+      id: validacao-formula1
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Validacao formula1
+        setup-command: pip install -r requirements.txt
+        command: bash tests/formula1_test.sh
+        input: ''
+        expected-output: |-
+          3
+          3
+          1 2 3
+          3
+          3
+          2 4
+          4
+        comparison-method: exact
+        timeout: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        VALIDACAO-FORMULA1_RESULTS: "${{steps.validacao-formula1.outputs.result}}"
+      with:
+        runners: validacao-formula1
